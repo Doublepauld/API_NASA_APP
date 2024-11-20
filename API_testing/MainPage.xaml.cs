@@ -41,19 +41,19 @@ namespace API_testing
         {
             InitializeComponent();
 
-            // Initialize services
+            
             _nasaApiService = new NASAApiService();
             var dbPath = Path.Combine(FileSystem.AppDataDirectory, "asteroids.db");
             _databaseService = new DatabaseService(dbPath);
             Debug.WriteLine($"Database Path: {dbPath}");
 
-            // Initialize collection for binding
+            
             Asteroids = new ObservableCollection<NearEarthObject>();
 
-            // Bind to UI
+            
             BindingContext = this;
 
-            // Load data
+           
             
             LoadAsteroids(DateTime.UtcNow.ToString("yyyy-MM-dd"), DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-dd"));
         }
@@ -62,29 +62,29 @@ namespace API_testing
         {
             try
             {
-                // Fetch data from API
+                
                 var apiKey = "";
 
                 var asteroidsFromApi = await _nasaApiService.GetAsteroidsAsync(DateStart, DateEnd, apiKey);
 
-                // Store data in SQLite
-                await _databaseService.ClearAsteroidsAsync(); // Clear old data
+               
+                await _databaseService.ClearAsteroidsAsync(); 
                 foreach (var asteroid in asteroidsFromApi)
                 {
-                    // Translate the OrbitingBody before saving to the database
+                    
                     if (PlanetTranslations.ContainsKey(asteroid.OrbitingBody))
                     {
                         asteroid.OrbitingBody = PlanetTranslations[asteroid.OrbitingBody];
                     }
 
-                    // Save asteroid with PotentiallyHazardous as boolean (no translation needed)
+                    
                     await _databaseService.SaveAsteroidAsync(asteroid);
                 }
 
-                // Load data from SQLite to display
+              
                 var asteroidsFromDb = await _databaseService.GetAsteroidsAsync();
 
-                // Update ObservableCollection
+                
                 Asteroids.Clear();
                 foreach (var asteroid in asteroidsFromDb)
                 {
@@ -101,17 +101,17 @@ namespace API_testing
 
         private void OnRefreshButtonClicked(object sender, EventArgs e)
         {
-            // Calculate most recent dates
+            
             var startDate = DateTime.UtcNow.ToString("yyyy-MM-dd");
             var endDate = DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-dd");
             Debug.WriteLine("testing");
-            // Reload asteroids with the new date range
+            
             LoadAsteroids(startDate, endDate);
         }
 
         private async void OnFilterButtonClicked(object sender, EventArgs e)
         {
-            // Display an action sheet for the filter options
+          
             string action = await DisplayActionSheet(
                 "Filrovat přes:",
                 "Zrušit",
@@ -126,13 +126,13 @@ namespace API_testing
             if (action == "Zrušit")
                 return;
 
-            // Use Task.Run to perform the filtering in the background
+           
             var filteredAsteroids = await Task.Run(() =>
             {
                 switch (action)
                 {
                     case "bez Filtru":
-                        return Asteroids.ToList(); // Return a List, not ObservableCollection
+                        return Asteroids.ToList(); 
 
                     case "Vzdálenost (nejbližší to Nejvzdálenější)":
                         return Asteroids.OrderBy(a => a.DistanceFromEarth).ToList();
@@ -147,14 +147,14 @@ namespace API_testing
                         return Asteroids.OrderByDescending(a => a.PotentiallyHazardous).ToList();
 
                     default:
-                        return Asteroids.ToList(); // Default to no filter
+                        return Asteroids.ToList(); 
                 }
             });
 
-            // After filtering, update the ObservableCollection on the main thread
+           
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                // Clear current list and add the filtered items
+               
                 Asteroids.Clear();
                 foreach (var asteroid in filteredAsteroids)
                 {

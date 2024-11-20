@@ -13,11 +13,11 @@ namespace API_testing.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public double EstimatedDiameter { get; set; }
-        public double DistanceFromEarth { get; set; } // Distance in kilometers
+        public double DistanceFromEarth { get; set; } 
         public bool PotentiallyHazardous { get; set; }
 
         public string PotentiallyHazardousTranslated => PotentiallyHazardous ? "Ano" : "Ne";
-        public string ApproachDate { get; set; } // Date of closest approach
-        public string OrbitingBody { get; set; } // Planet around which the object orbits
+        public string ApproachDate { get; set; }
+        public string OrbitingBody { get; set; } 
     }
 }
