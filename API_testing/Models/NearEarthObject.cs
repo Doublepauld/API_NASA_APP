@@ -10,11 +10,12 @@ namespace API_testing.Models
     public class NearEarthObject
     {
         [PrimaryKey, AutoIncrement]
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public double EstimatedDiameter { get; set; }
-        public string ApproachDate { get; set; }
-        public double RelativeVelocity { get; set; }
-        public double DistanceFromEarth { get; set; }
+        public double DistanceFromEarth { get; set; } // Distance in kilometers
+        public bool PotentiallyHazardous { get; set; }
+        public string ApproachDate { get; set; } // Date of closest approach
+        public string OrbitingBody { get; set; } // Planet around which the object orbits
     }
 }

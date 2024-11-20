@@ -37,11 +37,12 @@ namespace API_testing.Services
                     .Select(neo => new NearEarthObject
                     {
                         Name = neo.GetProperty("name").GetString(),
-                        Id = neo.GetProperty("id").GetString(),
+                        Id = int.Parse(neo.GetProperty("id").GetString()),
                         EstimatedDiameter = GetDoubleValue(neo.GetProperty("estimated_diameter").GetProperty("kilometers").GetProperty("estimated_diameter_max")),
+                        DistanceFromEarth = GetDoubleValue(neo.GetProperty("close_approach_data")[0].GetProperty("miss_distance").GetProperty("kilometers")),
+                        PotentiallyHazardous = neo.GetProperty("is_potentially_hazardous_asteroid").GetBoolean(),
                         ApproachDate = neo.GetProperty("close_approach_data")[0].GetProperty("close_approach_date").GetString(),
-                        RelativeVelocity = GetDoubleValue(neo.GetProperty("close_approach_data")[0].GetProperty("relative_velocity").GetProperty("kilometers_per_hour")),
-                        DistanceFromEarth = GetDoubleValue(neo.GetProperty("close_approach_data")[0].GetProperty("miss_distance").GetProperty("kilometers"))
+                        OrbitingBody = neo.GetProperty("close_approach_data")[0].GetProperty("orbiting_body").GetString()
                     })
                     .ToList();
 
@@ -50,8 +51,8 @@ namespace API_testing.Services
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine($"API Request Failed - Status Code: {response.StatusCode}");
-                Debug.WriteLine($"Error Content: {errorContent}");
+                Console.WriteLine($"API Request Failed - Status Code: {response.StatusCode}");
+                Console.WriteLine($"Error Content: {errorContent}");
                 throw new Exception($"API request failed with status: {response.StatusCode}");
             }
         }

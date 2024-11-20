@@ -41,7 +41,7 @@ namespace API_testing
             try
             {
                 // Fetch data from API
-                var apiKey = "ZkYfZ1uQKgUO2GTbZfvlrYCfiN4M6TlLtXb47jbm";
+                var apiKey = "wuKarJ47whqhzHh3GVkBBDHAEStFpJhEdOHlBqbF";
                 
                 var asteroidsFromApi = await _nasaApiService.GetAsteroidsAsync(DateStart, DateEnd, apiKey);
 
@@ -78,6 +78,56 @@ namespace API_testing
             Debug.WriteLine("testing");
             // Reload asteroids with the new date range
             LoadAsteroids(startDate, endDate);
+        }
+
+        private async void OnFilterButtonClicked(object sender, EventArgs e)
+        {
+            // Display an action sheet for the filter options
+            string action = await DisplayActionSheet(
+                "Filter by:",
+                "Cancel",
+                null,
+                "No Filter (Default)",
+                "Distance (Closest to Furthest)",
+                "Date of Approach (Soonest to Latest)",
+                "Diameter (Biggest to Smallest)",
+                "Hazardous (True to False)"
+            );
+
+            // Apply the chosen filter
+            switch (action)
+            {
+                case "No Filter (Default)":
+                    LoadAsteroids(DateTime.UtcNow.ToString("yyyy-MM-dd"), DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-dd"));
+                    break;
+
+                case "Distance (Closest to Furthest)":
+                    Asteroids = new ObservableCollection<NearEarthObject>(
+                        Asteroids.OrderBy(a => a.DistanceFromEarth));
+                    break;
+
+                case "Date of Approach (Soonest to Latest)":
+                    Asteroids = new ObservableCollection<NearEarthObject>(
+                        Asteroids.OrderBy(a => DateTime.Parse(a.ApproachDate)));
+                    break;
+
+                case "Diameter (Biggest to Smallest)":
+                    Asteroids = new ObservableCollection<NearEarthObject>(
+                        Asteroids.OrderByDescending(a => a.EstimatedDiameter));
+                    break;
+
+                case "Hazardous (True to False)":
+                    Asteroids = new ObservableCollection<NearEarthObject>(
+                        Asteroids.OrderByDescending(a => a.PotentiallyHazardous));
+                    break;
+
+                default:
+                    // Do nothing if Cancel is selected
+                    break;
+            }
+
+            // Re-bind the updated collection to the UI
+            BindingContext = this;
         }
     }
 
