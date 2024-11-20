@@ -63,7 +63,7 @@ namespace API_testing
             try
             {
                 // Fetch data from API
-                var apiKey = "wuKarJ47whqhzHh3GVkBBDHAEStFpJhEdOHlBqbF";
+                var apiKey = "";
 
                 var asteroidsFromApi = await _nasaApiService.GetAsteroidsAsync(DateStart, DateEnd, apiKey);
 
