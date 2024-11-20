@@ -15,6 +15,8 @@ namespace API_testing.Models
         public double EstimatedDiameter { get; set; }
         public double DistanceFromEarth { get; set; } // Distance in kilometers
         public bool PotentiallyHazardous { get; set; }
+
+        public string PotentiallyHazardousTranslated => PotentiallyHazardous ? "Ano" : "Ne";
         public string ApproachDate { get; set; } // Date of closest approach
         public string OrbitingBody { get; set; } // Planet around which the object orbits
     }

@@ -2,47 +2,101 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="API_testing.MainPage"
-             Title="Near Earth Objects">
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Filter" Clicked="OnFilterButtonClicked" />
-    </ContentPage.ToolbarItems>
+             Title=""
+             BackgroundColor="White">
 
     <ContentPage.Content>
-        <StackLayout Padding="10">
-            <Label Text="Near Earth Objects" 
-                   FontSize="24"
-                   HorizontalOptions="Center" />
-            <Button Text="Refresh Data" 
-                Clicked="OnRefreshButtonClicked" />
+        
+        <Grid>
 
-            <CollectionView ItemsSource="{Binding Asteroids}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <StackLayout Padding="10">
-                            <!-- Asteroid Name -->
-                            <Label Text="{Binding Name}" 
-                       FontAttributes="Bold" 
-                       FontSize="Medium" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="150" />
+                <!-- Title and Button Row -->
+                <RowDefinition Height="Auto" />
+                <!-- Filter Button Row -->
+                <RowDefinition Height="*" />
+                <!-- Content Row for CollectionView -->
+            </Grid.RowDefinitions>
 
-                            <!-- Estimated Diameter -->
-                            <Label Text="{Binding EstimatedDiameter, StringFormat='Diameter: {0:F2} km'}" />
+            <!-- Define columns for Title, Buttons -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <!-- Left for refresh button -->
+                <ColumnDefinition Width="*" />
+                <!-- Centered content -->
+                <ColumnDefinition Width="Auto" />
+                <!-- Right for filter button -->
+            </Grid.ColumnDefinitions>
 
-                            <!-- Distance From Earth -->
-                            <Label Text="{Binding DistanceFromEarth, StringFormat='Distance: {0:N2} km'}" />
+            <Grid BackgroundColor="Blue" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
+                <Label Text="Vesmírná tělesa" 
+               FontSize="24"
+               HorizontalOptions="Center" 
+               VerticalOptions="Center"
+               Grid.Row="0"
+               Grid.Column="0"
+               Grid.ColumnSpan="3"
+               TextColor="White"
+               HeightRequest="120"
+               Padding="20,20,20,0"
+               
+               />
 
-                            <!-- Potentially Hazardous -->
-                            <Label Text="{Binding PotentiallyHazardous, StringFormat='Potentially Hazardous: {0}'}" />
+                <!-- Refresh Button on the left, moved 20px down -->
+                <Button Text="Refresh Data" 
+                Clicked="OnRefreshButtonClicked"
+                Grid.Row="0"
+                Grid.Column="0"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                BackgroundColor="Grey"
+                CornerRadius="15"
+                Margin="0,80,0,0"/>
+                <!-- 20px top margin to move down -->
 
-                            <!-- Approach Date -->
-                            <Label Text="{Binding ApproachDate, StringFormat='Approach Date: {0}'}" />
+                <!-- Filter Button on the right, moved 20px down -->
+                <Button Text="Filtry" 
+                Clicked="OnFilterButtonClicked"
+                Grid.Row="0"
+                Grid.Column="2"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                BackgroundColor="Grey"
+                CornerRadius="15"
+                Margin="0,80,0,0"/>
+                <!-- 20px top margin to move down -->
+            </Grid>
 
-                            <!-- Orbiting Body -->
-                            <Label Text="{Binding OrbitingBody, StringFormat='Orbiting Body: {0}'}" />
-                        </StackLayout>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </StackLayout>
+            <!-- Scrollable CollectionView in the third row, spans the rest of the screen -->
+            <ScrollView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                <StackLayout Padding="10">
+                    <CollectionView ItemsSource="{Binding Asteroids}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="10">
+                                    <!-- Asteroid Name -->
+                                    <Label Text="{Binding Name , StringFormat='Jméno: {0}' }" FontAttributes="Bold" FontSize="Medium"/>
+
+                                    <!-- Estimated Diameter -->
+                                    <Label Text="{Binding EstimatedDiameter, StringFormat='Poloměr: {0:F2} km'}" />
+
+                                    <!-- Distance From Earth -->
+                                    <Label Text="{Binding DistanceFromEarth, StringFormat='vzdálenost: {0:N2} km'}" />
+
+                                    <!-- Potentially Hazardous -->
+                                    <Label Text="{Binding PotentiallyHazardousTranslated, StringFormat='nebezpečné: {0}'}" />
+                                    <!-- Approach Date -->
+                                    <Label Text="{Binding ApproachDate, StringFormat='Datum přiblížení: {0}'}" />
+
+                                    <!-- Orbiting Body -->
+                                    <Label Text="{Binding OrbitingBody, StringFormat='těleso orbity: {0}'}" />
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </StackLayout>
+            </ScrollView>
+
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

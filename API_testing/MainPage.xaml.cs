@@ -16,6 +16,27 @@ namespace API_testing
         private readonly DatabaseService _databaseService;
         public ObservableCollection<NearEarthObject> Asteroids { get; set; }
 
+        private Dictionary<string, string> PlanetTranslations = new Dictionary<string, string>
+        {
+            {"Mercury","Merkur" },
+            { "Earth", "Země" },
+            { "Mars", "Mars" },
+            { "Venus", "Venuše" },
+            { "Jupiter", "Jupiter" },
+            { "Saturn", "Saturn" },
+            { "Uranus", "Uran" },
+            { "Neptune", "Neptun" }
+           
+        };
+
+        private Dictionary<bool, string> Ano_ne = new Dictionary<bool, string>
+        {
+            {true, "Ano" },
+            { false,"Ne"}
+
+        };
+
+
         public MainPage()
         {
             InitializeComponent();
@@ -43,13 +64,20 @@ namespace API_testing
             {
                 // Fetch data from API
                 var apiKey = "wuKarJ47whqhzHh3GVkBBDHAEStFpJhEdOHlBqbF";
-                
+
                 var asteroidsFromApi = await _nasaApiService.GetAsteroidsAsync(DateStart, DateEnd, apiKey);
 
                 // Store data in SQLite
                 await _databaseService.ClearAsteroidsAsync(); // Clear old data
                 foreach (var asteroid in asteroidsFromApi)
                 {
+                    // Translate the OrbitingBody before saving to the database
+                    if (PlanetTranslations.ContainsKey(asteroid.OrbitingBody))
+                    {
+                        asteroid.OrbitingBody = PlanetTranslations[asteroid.OrbitingBody];
+                    }
+
+                    // Save asteroid with PotentiallyHazardous as boolean (no translation needed)
                     await _databaseService.SaveAsteroidAsync(asteroid);
                 }
 
@@ -85,17 +113,17 @@ namespace API_testing
         {
             // Display an action sheet for the filter options
             string action = await DisplayActionSheet(
-                "Filter by:",
-                "Cancel",
+                "Filrovat přes:",
+                "Zrušit",
                 null,
-                "No Filter (Default)",
-                "Distance (Closest to Furthest)",
-                "Date of Approach (Soonest to Latest)",
-                "Diameter (Biggest to Smallest)",
-                "Hazardous (True to False)"
+                "bez Filtru",
+                "Vzdálenost (nejbližší to Nejvzdálenější)",
+                "Datum přiblížení (nejbližší po nejdelší)",
+                "Poloměr (Největší po největší)",
+                "nebezpečné (Ano nebo ne)"
             );
 
-            if (action == "Cancel")
+            if (action == "Zrušit")
                 return;
 
             // Use Task.Run to perform the filtering in the background
@@ -103,19 +131,19 @@ namespace API_testing
             {
                 switch (action)
                 {
-                    case "No Filter (Default)":
+                    case "bez Filtru":
                         return Asteroids.ToList(); // Return a List, not ObservableCollection
 
-                    case "Distance (Closest to Furthest)":
+                    case "Vzdálenost (nejbližší to Nejvzdálenější)":
                         return Asteroids.OrderBy(a => a.DistanceFromEarth).ToList();
 
-                    case "Date of Approach (Soonest to Latest)":
+                    case "Datum přiblížení (nejbližší po nejdelší)":
                         return Asteroids.OrderBy(a => DateTime.Parse(a.ApproachDate)).ToList();
 
-                    case "Diameter (Biggest to Smallest)":
+                    case "Poloměr (Největší po největší)":
                         return Asteroids.OrderByDescending(a => a.EstimatedDiameter).ToList();
 
-                    case "Hazardous (True to False)":
+                    case "nebezpečné (Ano nebo ne)":
                         return Asteroids.OrderByDescending(a => a.PotentiallyHazardous).ToList();
 
                     default:
