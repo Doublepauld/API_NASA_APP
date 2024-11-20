@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Maui.Controls;
 
 
 namespace API_testing
@@ -94,40 +95,44 @@ namespace API_testing
                 "Hazardous (True to False)"
             );
 
-            // Apply the chosen filter
-            switch (action)
+            if (action == "Cancel")
+                return;
+
+            // Use Task.Run to perform the filtering in the background
+            var filteredAsteroids = await Task.Run(() =>
             {
-                case "No Filter (Default)":
-                    LoadAsteroids(DateTime.UtcNow.ToString("yyyy-MM-dd"), DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-dd"));
-                    break;
+                switch (action)
+                {
+                    case "No Filter (Default)":
+                        return Asteroids.ToList(); // Return a List, not ObservableCollection
 
-                case "Distance (Closest to Furthest)":
-                    Asteroids = new ObservableCollection<NearEarthObject>(
-                        Asteroids.OrderBy(a => a.DistanceFromEarth));
-                    break;
+                    case "Distance (Closest to Furthest)":
+                        return Asteroids.OrderBy(a => a.DistanceFromEarth).ToList();
 
-                case "Date of Approach (Soonest to Latest)":
-                    Asteroids = new ObservableCollection<NearEarthObject>(
-                        Asteroids.OrderBy(a => DateTime.Parse(a.ApproachDate)));
-                    break;
+                    case "Date of Approach (Soonest to Latest)":
+                        return Asteroids.OrderBy(a => DateTime.Parse(a.ApproachDate)).ToList();
 
-                case "Diameter (Biggest to Smallest)":
-                    Asteroids = new ObservableCollection<NearEarthObject>(
-                        Asteroids.OrderByDescending(a => a.EstimatedDiameter));
-                    break;
+                    case "Diameter (Biggest to Smallest)":
+                        return Asteroids.OrderByDescending(a => a.EstimatedDiameter).ToList();
 
-                case "Hazardous (True to False)":
-                    Asteroids = new ObservableCollection<NearEarthObject>(
-                        Asteroids.OrderByDescending(a => a.PotentiallyHazardous));
-                    break;
+                    case "Hazardous (True to False)":
+                        return Asteroids.OrderByDescending(a => a.PotentiallyHazardous).ToList();
 
-                default:
-                    // Do nothing if Cancel is selected
-                    break;
-            }
+                    default:
+                        return Asteroids.ToList(); // Default to no filter
+                }
+            });
 
-            // Re-bind the updated collection to the UI
-            BindingContext = this;
+            // After filtering, update the ObservableCollection on the main thread
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                // Clear current list and add the filtered items
+                Asteroids.Clear();
+                foreach (var asteroid in filteredAsteroids)
+                {
+                    Asteroids.Add(asteroid);
+                }
+            });
         }
     }
 
